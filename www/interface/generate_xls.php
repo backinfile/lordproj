@@ -1,5 +1,5 @@
 <?php
-function generate_xls($data,$filename) {
+function generate_xls($data,$filename,$title) {
 	if (!is_array($data)) return;
 	if (empty($data)) return;
 	if (!is_array($data[0])) return;

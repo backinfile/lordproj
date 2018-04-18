@@ -11,7 +11,6 @@ create table users (
 id int not null auto_increment key,
 phone varchar(32) not null unique key,
 upper varchar(32),
-pwd varchar(64),
 time datetime not null) DEFAULT CHARSET=utf8;
 EOF;
 $sql_create_orders = <<<EOF
