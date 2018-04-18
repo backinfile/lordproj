@@ -1,8 +1,8 @@
 <html>
 	<head>
 		<meta charset="utf-8"/>
-		<link rel="stylesheet" href="../lib/weui/lib/weui.min.css">
-		<link rel="stylesheet" href="../lib/weui/css/jquery-weui.css">
+		<link rel="stylesheet" href="lib/weui/lib/weui.min.css">
+		<link rel="stylesheet" href="lib/weui/css/jquery-weui.css">
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"> 
 		<script src="lib/weui/lib/jquery.js"></script>
 		<script src="lib/weui/lib/fastclick.js"></script>
@@ -34,20 +34,35 @@
 			  <label class="weui-label">邀请人</label>
 			</div>
 			<div class="weui-cell__bd">
-			  <input class="weui-input" type="number" id="upper" placeholder="邀请人(选填)">
+			  <input class="weui-input" type="number" id="upper" placeholder="手机号或邀请码(选填)">
 			</div>
 		  </div>
 		  </div>
-		  <div class="weui-cells__tips">填写邀请人的手机号</div>
+		  <!-- <div class="weui-cells__tips">填写邀请人的手机号或邀请码</div> -->
 		  
 
 		<div class="weui-btn-area">
 		  <a class="weui-btn weui-btn_primary" href="javascript:" id="showTooltips">提交</a>
 		</div>
-
+		<br/>
+		<a class="weui-btn weui-btn_primary" href="./service?s=1" >service1</a>
 		<script>
+		  function getPar(par){
+			var local_url = document.location.href; 
+			var get = local_url.indexOf(par +"=");
+			if(get == -1){
+				return false;   
+			}   
+			var get_par = local_url.slice(par.length + get + 1);   
+			var nextPar = get_par.indexOf("&");
+			if(nextPar != -1){
+				get_par = get_par.slice(0, nextPar);
+			}
+			return get_par;
+		}
 		  $(function() {
 			FastClick.attach(document.body);
+			//$("#upper").val(getPar('invite'));
 		  });
 		  //function(){ setTimeout(function() { window.scrollTo(0, 1) }, 0); };
 		  function check_phone(str){

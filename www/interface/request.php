@@ -10,13 +10,21 @@ if (get_post("request")) {
 			break;
 		}
 		$upper = get_post("upper");
-		if ($upper && check_phone($upper)) {
-			$ret['error'] = "邀请人手机号格式不正确";
+		if ($upper && !check_phone($upper)) {
+			if (check_digit($upper)) {
+				
+			} else if (check_phone($upper)) {
+				
+			}
+			$ret['error'] = "邀请人格式不正确".$upper;
 			break;
 		}
 		$phone = "'".$phone."'";
-		if ($upper) $upper = "'".$upper."'";
-		else $upper = "null";
+		if ($upper) {
+			$upper = "'".$upper."'";
+			// $sql_find = "select id from users where phone=".$upper.";";
+		} else $upper = "null";
+		
 		$sql = "insert into users (phone,upper,time) values ("
 			.$phone.",".$upper.",now());";
 		$result = run_sql($sql);

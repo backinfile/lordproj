@@ -2,7 +2,8 @@
 require('run_sql.php');
 require('generate_xls.php');
 $sql = <<<EOF
-select * from users;
+select phone,upper,time from users;
 EOF;
-generate_xls(run_sql($sql)['data'],'用户');
+$data = run_sql($sql)['data'];
+generate_xls($data,'用户',array("手机号","邀请人","创建时间"));
 ?>
