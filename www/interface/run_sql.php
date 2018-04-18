@@ -1,4 +1,5 @@
 <?php
+
 function run_sql($sql) {
 	$res = array('state'=>false,'data'=>array(),'error'=>null,'errno'=>null);
 	$con = @mysqli_connect('localhost','root','123456','lord');

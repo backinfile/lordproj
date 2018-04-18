@@ -10,11 +10,73 @@
 	</head>
 	<body ontouchstart>
 	<br>
-		<a href="./interface" class="weui-btn weui-btn_primary">download</a>
-		<a href="./test" class="weui-btn weui-btn_primary">test</a>
+		<a href="./interface" class="weui-btn weui-btn_primary">下载用户表</a>
+		<div class="weui-cells weui-cells_form">
+		  <div class="weui-cell ">
+			<div class="weui-cell__hd">
+			  <label class="weui-label">手机号</label>
+			</div>
+			<div class="weui-cell_bd">
+			  <input class="weui-input" type="number" id="tel" placeholder="手机号(必填)" >
+			</div>
+		  </div>
+		  <div class="weui-cell weui-cell_vcode">
+			<div class="weui-cell__hd"><label class="weui-label">验证码</label></div>
+			<div class="weui-cell__bd">
+			  <input class="weui-input" type="number" placeholder="验证码">
+			</div>
+			<div class="weui-cell__ft">
+			  <button class="weui-vcode-btn">获取验证码</button>
+			</div>
+		  </div>
+		  <div class="weui-cell">
+			<div class="weui-cell__hd">
+			  <label class="weui-label">邀请人</label>
+			</div>
+			<div class="weui-cell__bd">
+			  <input class="weui-input" type="number" id="upper" placeholder="邀请人(选填)">
+			</div>
+		  </div>
+		  </div>
+		  <div class="weui-cells__tips">填写邀请人的手机号</div>
+		  
+
+		<div class="weui-btn-area">
+		  <a class="weui-btn weui-btn_primary" href="javascript:" id="showTooltips">提交</a>
+		</div>
+
 		<script>
 		  $(function() {
 			FastClick.attach(document.body);
+		  });
+		  //function(){ setTimeout(function() { window.scrollTo(0, 1) }, 0); };
+		  function check_phone(str){
+			if (!str) return '请输入手机号';
+			if (/^1\d{10}$/.test(str)) return false;
+			return "手机号格式不正确";
+		  }
+		  $("#showTooltips").click(function() {
+				var tel = $('#tel').val().trim();
+				var upper = $('#upper').val().trim();
+				var tmp = check_phone(tel);
+				if (tmp) {$.toptip(tmp);return;}
+				tmp = check_phone(upper);
+				if (upper && tmp) {
+					$.toptip('邀请人手机号的格式不正确');
+					return;
+				}
+				$.ajax({
+					type: 'POST',
+					url: './interface/request.php',
+					data: {request:'insertuser',phone:tel,upper:upper},
+					dataType: 'json'
+				}).success(function(data){
+					if (data['state']) $.toptip('提交成功', 'success');
+					else $.toptip('提交失败');
+					console.log(data);
+				}).error(function() {
+					$.toptip('提交失败');
+				});
 		  });
 		</script>
 	</body>

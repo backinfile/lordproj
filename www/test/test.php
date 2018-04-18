@@ -57,7 +57,7 @@ insert into users
 values
 (12345678917, 12345678913, null, now());
 EOF; */
-$sql = <<<EOF
+/* $sql = <<<EOF
 select phone,upper,time from users;
 EOF;
 function run_sql($sql) {
@@ -86,7 +86,7 @@ function run_sql($sql) {
 	mysqli_close($con);
 	return $res;
 }
-echo json_encode(run_sql($sql));
+echo json_encode(run_sql($sql)); */
 ?>
 
 
