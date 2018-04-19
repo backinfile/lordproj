@@ -9,8 +9,8 @@ function check_digit($str) {
 	return false;
 }
 function get_post($key) {
-	if (array_key_exists($key,$_POST)) {
-		return ($_POST[$key]).trim();
+	if (isset($_POST[$key])) {//(array_key_exists($key,$_POST)) {
+		return trim((string)$_POST[$key]);
 	}
 	return null;
 }
