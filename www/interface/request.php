@@ -14,17 +14,16 @@ if (get_post("request")) {
 			$upper = get_post("upper");
 			if ($upper) {
 				if (check_digit($upper)) {
-					die("in");
 					$sql = "select phone from users where id='".$upper."';";
 					$upper = check_sql_exist($sql,'phone');
 					if (!$upper) {
-						$ret['error'] = "邀请人不存在";
+						$ret['error'] = "invite";
 						break;
 					}
 				} else if (check_phone($upper)) {
 					$sql = "select id from users where phone='".$upper."';";
 					if (!check_sql_exist($sql)) {
-						$ret['error'] = "邀请人不存在";
+						$ret['error'] = "invite";
 						break;
 					}
 				} else {
@@ -63,7 +62,7 @@ if (get_post("request")) {
 			$ret['state'] = false;
 			$ret['error'] = "phone error";
 		} else {
-			$sql = "select o.phone,o.service,o.state,o.is_rewarded,o.reward,o.time,o.last_time,o.note".
+			$sql = "select o.phone,o.service,o.state,o.is_rewarded,o.reward,o.time,o.last_time,o.note,o.value".
 					" from orders o,users u where u.upper=".$phone." and o.phone=u.phone;";
 			$result = run_sql($sql);
 			$ret['state'] = $result['state'];
@@ -143,6 +142,18 @@ if (get_post("request")) {
 			$ret['state'] = $result['state'];
 			$ret['error'] = $result['error'];
 		} while (0);
+	} else if ($request == "querylaststate") {
+		$phone = get_post("phone");
+		if (!check_phone($phone)) {
+			$ret['state'] = false;
+			$ret['error'] = "phone error";
+		} else {
+			$sql = "select state from orders where phone=".$phone." order by time desc limit 1;";
+			$result = run_sql($sql);
+			$ret['state'] = $result['state'];
+			$ret['error'] = $result['error'];
+			$ret['data'] = $result['data'];
+		}
 	} 
 	/* else if ($request == "login") {
 		$phone = get_post("phone");

@@ -1,0 +1,143 @@
+
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"> 
+		<link rel="stylesheet" href="../lib/weui/lib/weui.min.css">
+		<link rel="stylesheet" href="../lib/weui/css/jquery-weui.css">
+		<script src="../lib/weui/lib/jquery.js"></script>
+		<script src="../lib/weui/lib/fastclick.js"></script>
+		<script src="../lib/weui/js/jquery-weui.js"></script>
+		<script src="./js/function.js"></script>
+	</head>
+	<body ontouchstart>
+	<div id='user'>
+		<div class="weui-loadmore">
+		  <i class="weui-loading"></i>
+		  <span class="weui-loadmore__tips">正在加载</span>
+		</div>
+	</div>
+	<div id="reg" class="weui-popup__container">
+	  <div class="weui-popup__overlay"></div>
+	  <div class="weui-popup__modal">
+		<br/>
+		<div class="weui-cells weui-cells_form">
+		  <div class="weui-cell ">
+			<div class="weui-cell__hd">
+			  <label class="weui-label">手机号</label>
+			</div>
+			<div class="weui-cell_bd">
+			  <input class="weui-input" type="number" id="tel" placeholder="手机号(必填)" >
+			</div>
+		  </div>
+		  <div class="weui-cell weui-cell_vcode">
+			<div class="weui-cell__hd"><label class="weui-label">验证码</label></div>
+			<div class="weui-cell__bd">
+			  <input class="weui-input" type="number" placeholder="验证码">
+			</div>
+			<div class="weui-cell__ft">
+			  <button class="weui-vcode-btn">获取验证码</button>
+			</div>
+		  </div>
+		  <div class="weui-cell">
+			<div class="weui-cell__hd">
+			  <label class="weui-label">邀请人</label>
+			</div>
+			<div class="weui-cell__bd">
+			  <input class="weui-input" type="number" id="upper" placeholder="手机号或邀请码(选填)">
+			</div>
+		  </div>
+		  </div>
+		  <div class="weui-cells__tips">填写邀请人的手机号或邀请码</div> 
+		<div class="weui-btn-area">
+		  <a class="weui-btn weui-btn_primary" href="javascript:" id="showTooltips">提交</a>
+		  <a href="javascript:;" class="weui-btn weui-btn_primary close-popup">取消</a>
+		</div>
+		<br/>
+		
+	  </div>
+	</div>
+	<div class="weui-footer weui-footer_fixed-bottom" style="background-color:white">
+	  <p class="weui-footer__links">
+		<a href="javascript:quit()" class="weui-footer__link">退出登录</a>
+	  </p>
+	  <p class="weui-footer__text">Copyright © 2008-2016 weui.io</p>
+	</div>
+	<script>
+	function quit() {
+		delCookie('phone');
+		$.toptip("已安全退出");
+		setTimeout(function(){location.reload();}, 1000);
+	}
+	var invite = getPar('invite');
+	if (invite) setCookie('invite',invite,1);
+	$(function() {
+		var invite = getCookie('invite');
+		if (invite) $('#upper').val(invite);
+	});
+	var phone = getCookie('phone');
+	if (phone) {
+		$.ajax({
+			type: 'POST',
+			url: '../interface/request.php',
+			data: {'request':'querylaststate','phone':phone},
+			dataType: 'json'
+		}).success(function(data){
+			if (data['state'] && data['data']) {
+				var state = get_order_state(data['data'][0]['state']);
+				if (!state) state = "无订单";
+				$('#user').html(html_user(phone,state));
+			} else {
+				$.toptip("请重新登录");
+				delCookie('phone');
+			}
+		});
+	} else {
+		$('#user').html(html_reg());
+	}
+	</script>
+	<script>
+	  $(function() {
+		FastClick.attach(document.body);
+		//$("#upper").val(getPar('invite'));
+		setTimeout(function() { window.scrollTo(0, 1); }, 0);
+	  });
+	  $("#showTooltips").click(function() {
+			var tel = $('#tel').val().trim();
+			var upper = $('#upper').val().trim();
+			if (!check_phone(tel)) {$.toptip('手机号的格式不正确');return;}
+			if (upper && !check_phone(upper) && !check_digit(upper)) {
+				$.toptip('邀请人的格式不正确');
+				return;
+			}
+			$.hideLoading();
+			$.showLoading();
+			$.ajax({
+				type: 'POST',
+				url: '../interface/request.php',
+				data: {request:'insertuser',phone:tel,upper:upper},
+				dataType: 'json'
+			}).success(function(data){
+				if (data['state']) $.toptip('提交成功', 'success');
+				else {
+					if (/^Duplicate/.test(data['error'])) {
+						$.toptip('登录成功', 'success');
+						setCookie('phone', tel);
+						setTimeout(function(){location.reload();}, 1000);
+					} else if(/^invite/.test(data['error'])) {
+						$.toptip('邀请人不存在');
+					} else {
+						$.toptip('提交失败');
+					}
+				}
+				console.log(data);
+				$.hideLoading();
+			}).error(function(err) {
+				console.log(err);
+				$.toptip('提交失败');
+				$.hideLoading();
+			});
+	  });
+	</script>
+	</body>
+</html>

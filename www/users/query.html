@@ -1,0 +1,99 @@
+
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"> 
+		<link rel="stylesheet" href="../lib/weui/lib/weui.min.css">
+		<link rel="stylesheet" href="../lib/weui/css/jquery-weui.css">
+		<script src="../lib/weui/lib/jquery.js"></script>
+		<script src="../lib/weui/lib/fastclick.js"></script>
+		<script src="../lib/weui/js/jquery-weui.js"></script>
+		<script src="./js/function.js"></script>
+	</head>
+	<body ontouchstart>
+	<div class="weui-tab">
+      <div class="weui-navbar">
+        <a class="weui-navbar__item weui-bar__item--on" href="#tab1">
+          个人订单
+        </a>
+        <a class="weui-navbar__item" href="#tab2">
+          已邀请订单
+        </a>
+      </div>
+      <div class="weui-tab__bd">
+        <div id="tab1" class="weui-tab__bd-item weui-tab__bd-item--active">
+			<div class="weui-cells__title">订单更新会有延迟</div><br/>
+			<div id="content">
+				<div class="weui-loadmore">
+				  <i class="weui-loading"></i>
+				  <span class="weui-loadmore__tips">正在加载</span>
+				</div>
+			</div>
+        </div>
+        <div id="tab2" class="weui-tab__bd-item">
+			<div class="weui-cells__title"><a href="./invite.html">如何邀请别人？</a></div>
+			<div id="content2">
+				<div class="weui-loadmore">
+				  <i class="weui-loading"></i>
+				  <span class="weui-loadmore__tips">正在加载</span>
+				</div>
+			</div>
+        </div>
+      </div>
+    </div>
+	<div class="weui-footer weui-footer_fixed-bottom" style="background-color:white">
+	  <p class="weui-footer__links">
+		<a href="./" class="weui-footer__link">返回主页</a>
+	  </p>
+	  <p class="weui-footer__text">Copyright © 2008-2016 weui.io</p>
+	</div>
+	<script>
+	//setCookie('phone',12345678911,7);
+	var phone = getCookie('phone');
+	if (phone) {
+		$.ajax({
+			type: 'POST',
+			url: '../interface/request.php',
+			data: {'request':'queryorder','phone':phone},
+			dataType: 'json'
+		}).success(function(data){
+			console.log(data);
+			if (data['state'] && data['data'].length) {
+				var froms = data['data'];
+				var htmlstr = '';
+				for(i=0; i<froms.length; i++) {
+					htmlstr += html_order1(froms[i])+'<br/>';
+				}
+				$('#content').html(htmlstr);
+			} else {
+				$('#content').html(html_load_more('暂无订单'));
+			}
+		}).error(function(err) {
+			$('#content').html(html_load_more('暂无订单'));
+			console.log(err);
+		});
+		$.ajax({
+			type: 'POST',
+			url: '../interface/request.php',
+			data: {'request':'queryorder2','phone':phone},
+			dataType: 'json'
+		}).success(function(data){
+			console.log(data,'2');
+			if (data['state'] && data['data'].length) {
+				var froms = data['data'];
+				var htmlstr = '';
+				for(i=0; i<froms.length; i++) {
+					htmlstr += html_order1(froms[i])+'<br/>';
+				}
+				$('#content2').html(htmlstr);
+			} else {
+				$('#content2').html(html_load_more('暂无订单'));
+			}
+		}).error(function(err) {
+			$('#content2').html(html_load_more('暂无订单'));
+			console.log(err);
+		});
+	}
+	</script>
+	</body>
+</html>
