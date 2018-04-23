@@ -31,7 +31,7 @@
 			</div>
         </div>
         <div id="tab2" class="weui-tab__bd-item">
-			<div class="weui-cells__title"><a href="./invite.html">如何邀请别人？</a></div>
+			<div class="weui-cells__title"><a href="./invite.html">如何邀请别人？</a></div><br/>
 			<div id="content2">
 				<div class="weui-loadmore">
 				  <i class="weui-loading"></i>
@@ -61,9 +61,10 @@
 			if (data['state'] && data['data'].length) {
 				var froms = data['data'];
 				var htmlstr = '';
-				for(i=0; i<froms.length; i++) {
+				for(i=0; i< froms.length; i++) {
 					htmlstr += html_order1(froms[i])+'<br/>';
 				}
+				htmlstr += '<br/><br/><br/>';
 				$('#content').html(htmlstr);
 			} else {
 				$('#content').html(html_load_more('暂无订单'));
@@ -82,9 +83,10 @@
 			if (data['state'] && data['data'].length) {
 				var froms = data['data'];
 				var htmlstr = '';
-				for(i=0; i<froms.length; i++) {
-					htmlstr += html_order1(froms[i])+'<br/>';
+				for(i=0; i< froms.length; i++) {
+					htmlstr += html_order2(froms[i])+'<br/>';
 				}
+				htmlstr += '<br/><br/><br/>';
 				$('#content2').html(htmlstr);
 			} else {
 				$('#content2').html(html_load_more('暂无订单'));

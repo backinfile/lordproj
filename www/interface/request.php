@@ -62,8 +62,21 @@ if (get_post("request")) {
 			$ret['state'] = false;
 			$ret['error'] = "phone error";
 		} else {
-			$sql = "select o.phone,o.service,o.state,o.is_rewarded,o.reward,o.time,o.last_time,o.note,o.value".
+			$sql = "select o.id,o.phone,o.service,o.state,o.is_rewarded,o.reward,o.time,o.last_time,o.note,o.value".
 					" from orders o,users u where u.upper=".$phone." and o.phone=u.phone;";
+			$result = run_sql($sql);
+			$ret['state'] = $result['state'];
+			$ret['error'] = $result['error'];
+			$ret['data'] = $result['data'];
+		}
+	} else if ($request == "queryorder3") {
+		$id = get_post("id");
+		if (!check_digit($id)) {
+			$ret['state'] = false;
+			$ret['error'] = "id error";
+		} else {
+			$sql = "select id,phone,service,state,is_rewarded,reward,time,last_time,note,value ".
+					"from orders where id=".$id.";";
 			$result = run_sql($sql);
 			$ret['state'] = $result['state'];
 			$ret['error'] = $result['error'];
@@ -78,10 +91,10 @@ if (get_post("request")) {
 				break;
 			}
 			$service = get_post("service");
-			if (!check_digit($service)) {
-				$ret['state'] = false;
-				$ret['error'] = "service error";
-				break;
+			if (!$service) {
+				$service = "null";
+			} else {
+				$service = "'".$service."'";
 			}
 			$state = get_post("state");
 			if (!check_digit($state)) {
@@ -97,12 +110,18 @@ if (get_post("request")) {
 			}
 			$reward = get_post("reward");
 			if (!$reward) $reward = "null";
+			else $reward = "'".$reward."'";
 			$note = get_post("note");
 			if (!$note) $note = "null";
-			$sql = "insert into orders(phone,service,state,is_rewarded,reward,time,last_time,note)".
+			else $note = "'".$note."'";
+			$value = get_post("value");
+			if (!$value) $value = "null";
+			else $value = "'".$value."'";
+			$sql = "insert into orders(phone,service,state,is_rewarded,reward,time,last_time,note,value)".
 					" values(".$phone.",".$service.",".$state.",".$is_rewarded.",".$reward.
-					",now(),now(),".$note.");";
+					",now(),now(),".$note.",".$value.");";
 			$result = run_sql($sql);
+			$ret['sql'] = $sql;
 			$ret['state'] = $result['state'];
 			$ret['error'] = $result['error'];
 		} while (0);
@@ -115,15 +134,21 @@ if (get_post("request")) {
 				break;
 			}
 			$service = get_post("service");
-			if (!check_digit($service)) {
-				$ret['state'] = false;
-				$ret['error'] = "service error";
-				break;
+			if (!$service) {
+				$service = "null";
+			} else {
+				$service = "'".$service."'";
 			}
 			$state = get_post("state");
 			if (!check_digit($state)) {
 				$ret['state'] = false;
 				$ret['error'] = "state error";
+				break;
+			}
+			$id = get_post("id");
+			if (!check_digit($id)) {
+				$ret['state'] = false;
+				$ret['error'] = "id error";
 				break;
 			}
 			$is_rewarded = get_post("is_rewarded");
@@ -134,10 +159,18 @@ if (get_post("request")) {
 			}
 			$reward = get_post("reward");
 			if (!$reward) $reward = "null";
+			else $reward = "'".$reward."'";
 			$note = get_post("note");
 			if (!$note) $note = "null";
+			else $note = "'".$note."'";
+			$value = get_post("value");
+			if (!$value) $value = "null";
+			else $value = "'".$value."'";
 			$sql = "update orders set phone=".$phone.",service=".$service.",state=".$state.
-					",is_rewarded=".$is_rewarded.",reward=".$reward.",last_time=now(),note=".$note.");";
+					",is_rewarded=".$is_rewarded.",reward=".$reward.",last_time=now(),note=".$note.
+					",value=".$value." ".
+					"where id=".$id.";";
+			$ret['sql'] = $sql;
 			$result = run_sql($sql);
 			$ret['state'] = $result['state'];
 			$ret['error'] = $result['error'];
@@ -148,13 +181,25 @@ if (get_post("request")) {
 			$ret['state'] = false;
 			$ret['error'] = "phone error";
 		} else {
-			$sql = "select state from orders where phone=".$phone." order by time desc limit 1;";
+			$sql = "select state,id from orders where phone=".$phone." order by time desc limit 1;";
 			$result = run_sql($sql);
 			$ret['state'] = $result['state'];
 			$ret['error'] = $result['error'];
 			$ret['data'] = $result['data'];
 		}
-	} 
+	} else if ($request == "queryid") {
+		$phone = get_post("phone");
+		if (!check_phone($phone)) {
+			$ret['state'] = false;
+			$ret['error'] = "phone error";
+		} else {
+			$sql = "select id from users where phone=".$phone." order by time desc limit 1;";
+			$result = run_sql($sql);
+			$ret['state'] = $result['state'];
+			$ret['error'] = $result['error'];
+			$ret['data'] = $result['data'];
+		}
+	}
 	/* else if ($request == "login") {
 		$phone = get_post("phone");
 		$sql = "select id from users where phone=".$phone.";";

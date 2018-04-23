@@ -61,6 +61,41 @@ function html_order1(data) {
 	return '<div class="weui-form-preview">'+
 		'<div class="weui-form-preview__hd">'+
 		'<label class="weui-form-preview__label">付款金额</label>'+
+		'<em class="weui-form-preview__value">'+data['value']+'</em></div>'+
+		'<div class="weui-form-preview__bd">'+
+        '<div class="weui-form-preview__item">'+
+          '<label class="weui-form-preview__label" >账单状态</label>'+
+          '<b><span class="weui-form-preview__value" style="color:red;">'+state+'</span></b></div>'+
+        '<div class="weui-form-preview__item">'+
+          '<label class="weui-form-preview__label">账单id</label>'+
+          '<span class="weui-form-preview__value">'+data['id']+'</span></div>'+
+        '<div class="weui-form-preview__item">'+
+          '<label class="weui-form-preview__label">产品种类</label>'+
+          '<span class="weui-form-preview__value">'+data['service']+'</span></div>'+
+        '<div class="weui-form-preview__item">'+
+          '<label class="weui-form-preview__label">创建时间</label>'+
+          '<span class="weui-form-preview__value">'+data['time']+'</span></div>'+
+        '<div class="weui-form-preview__item">'+
+          '<label class="weui-form-preview__label">修改时间</label>'+
+          '<span class="weui-form-preview__value">'+data['last_time']+'</span></div>'+
+        '<div class="weui-form-preview__item">'+
+          '<label class="weui-form-preview__label">备注</label>'+
+          '<span class="weui-form-preview__value">'+data['note']+'</span>'+
+        '</div></div>'+
+      '<div class="weui-form-preview__ft">'+
+        //'<a class="weui-form-preview__btn weui-form-preview__btn_primary" href="javascript:">操作</a>'+
+      '</div></div>';
+}
+function html_order2(data) {
+	var states = {'0':'正在受理','1':'成功受理','2':'失败'};
+	var state = states[data['state']];
+	if (!state) state = null;
+	var is_rewarded = data['is_rewarded'];
+	if (is_rewarded == '1') is_rewarded = "是";
+	else is_rewarded = "否";
+	return '<div class="weui-form-preview">'+
+		'<div class="weui-form-preview__hd">'+
+		'<label class="weui-form-preview__label">付款金额</label>'+
 		'<em class="weui-form-preview__value">'+(data['value']?data['value']:0)+'</em></div>'+
 		'<div class="weui-form-preview__bd">'+
         '<div class="weui-form-preview__item">'+
@@ -69,6 +104,15 @@ function html_order1(data) {
         '<div class="weui-form-preview__item">'+
           '<label class="weui-form-preview__label">账单id</label>'+
           '<span class="weui-form-preview__value">'+data['id']+'</span></div>'+
+        '<div class="weui-form-preview__item">'+
+          '<label class="weui-form-preview__label">手机号</label>'+
+          '<span class="weui-form-preview__value">'+data['phone']+'</span></div>'+
+        '<div class="weui-form-preview__item">'+
+          '<label class="weui-form-preview__label">是否已返利</label>'+
+          '<span class="weui-form-preview__value">'+is_rewarded+'</span></div>'+
+        '<div class="weui-form-preview__item">'+
+          '<label class="weui-form-preview__label">返利金额</label>'+
+          '<span class="weui-form-preview__value">'+data['reward']+'</span></div>'+
         '<div class="weui-form-preview__item">'+
           '<label class="weui-form-preview__label">产品种类</label>'+
           '<span class="weui-form-preview__value">'+data['service']+'</span></div>'+

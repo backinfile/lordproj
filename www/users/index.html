@@ -50,13 +50,19 @@
 		  </div>
 		  <div class="weui-cells__tips">填写邀请人的手机号或邀请码</div> 
 		<div class="weui-btn-area">
-		  <a class="weui-btn weui-btn_primary" href="javascript:" id="showTooltips">提交</a>
+		  <a class="weui-btn weui-btn_primary" href="javascript:" id="showTooltips">注册/登录</a>
 		  <a href="javascript:;" class="weui-btn weui-btn_primary close-popup">取消</a>
 		</div>
 		<br/>
 		
 	  </div>
 	</div>
+	<br/>
+	<article class="weui-article">
+	  <section>
+			<a href="http://t.cn/RmC6uhi"><img src="1.jpg" alt=""></a>
+	  </section>
+	</article>
 	<div class="weui-footer weui-footer_fixed-bottom" style="background-color:white">
 	  <p class="weui-footer__links">
 		<a href="javascript:quit()" class="weui-footer__link">退出登录</a>
@@ -65,9 +71,13 @@
 	</div>
 	<script>
 	function quit() {
-		delCookie('phone');
-		$.toptip("已安全退出");
-		setTimeout(function(){location.reload();}, 1000);
+		if (getCookie('phone')) {
+			delCookie('phone');
+			$.toptip("已安全退出");
+			setTimeout(function(){location.reload();}, 1000);
+		} else {
+			$.toptip("尚未登录");
+		}
 	}
 	var invite = getPar('invite');
 	if (invite) setCookie('invite',invite,1);
@@ -83,13 +93,18 @@
 			data: {'request':'querylaststate','phone':phone},
 			dataType: 'json'
 		}).success(function(data){
-			if (data['state'] && data['data']) {
-				var state = get_order_state(data['data'][0]['state']);
-				if (!state) state = "无订单";
-				$('#user').html(html_user(phone,state));
+			if (data['state']) {
+				if (data['data'].length) {
+					var state = get_order_state(data['data'][0]['state']);
+					$('#user').html(html_user(phone,state));
+				} else {
+					state = "尚无订单";
+					$('#user').html(html_user(phone,state));
+				}
 			} else {
 				$.toptip("请重新登录");
 				delCookie('phone');
+				setTimeout(function(){location.reload();}, 1000);
 			}
 		});
 	} else {
@@ -118,8 +133,11 @@
 				data: {request:'insertuser',phone:tel,upper:upper},
 				dataType: 'json'
 			}).success(function(data){
-				if (data['state']) $.toptip('提交成功', 'success');
-				else {
+				if (data['state']) {
+					setCookie('phone', tel);
+					$.toptip('注册成功', 'success');
+					setTimeout(function(){location.reload();}, 1000);
+				} else {
 					if (/^Duplicate/.test(data['error'])) {
 						$.toptip('登录成功', 'success');
 						setCookie('phone', tel);

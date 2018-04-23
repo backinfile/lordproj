@@ -14,23 +14,23 @@
 	<article class="weui-article">
           <h1>如何邀请别人？</h1>
           <section>
-            <h2 class="title">章标题</h2>
+            <h2 class="title">方法一</h2>
             <section>
-              <h3>1.1 节标题</h3>
               <p>
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-                quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-                consequat.
+			  在其他人注册时，填入您的邀请码或您的手机号，即视为您邀请了一位用户。
+              </p>
+              <p>
+			  您的邀请码为<span id="id"><i class="weui-loading"></i></span>
               </p>
             </section>
+			
+            <h2 class="title">方法二</h2>
             <section>
-              <h3>1.2 节标题</h3>
               <p>
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-                cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-                proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                其他人使用您的邀请链接，在注册时会自动填入您的邀请信息。
+              </p>
+              <p>
+			  您的邀请链接为<span id="id2"><i class="weui-loading"></i></span>
               </p>
             </section>
           </section>
@@ -41,5 +41,30 @@
 		  </p>
 		  <p class="weui-footer__text">Copyright © 2008-2016 weui.io</p>
 		</div>
+		<script>
+		var phone = getCookie('phone');
+		$.ajax({
+			type: 'POST',
+			url: '../interface/request.php',
+			data: {'request':'queryid','phone':phone},
+			dataType: 'json'
+		}).success(function(data){
+			console.log(data);
+			if (data['state']) {
+				if (data['data'].length) {
+					var id = (data['data'][0]['id']);
+					$('#id').html("<b> "+id+" </b>");
+					$('#id2').html("<input class='weui-input' value=http://laiok.iok.la/users?invite="+id+"></input>");
+					
+				} else {
+					$('#id').html("<b>查询失败</b>");
+					$('#id2').html("<b>查询失败</b>");
+				}
+			} else {
+				$('#id').html("<b>查询失败</b>");
+				$('#id2').html("<b>查询失败</b>");
+			}
+		});
+		</script>
 	</body>
 </html>
