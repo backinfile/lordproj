@@ -39,6 +39,13 @@
 		<div class="weui-cell__ft">
 		</div>
 	  </a>
+	  <a class="weui-cell weui-cell_access" href="service.html">
+		<div class="weui-cell__bd">
+		  <p>添加产品</p>
+		</div>
+		<div class="weui-cell__ft">
+		</div>
+	  </a>
 	</div>
 	<div class="weui-cells weui-cells_form">
 	  <div class="weui-cell weui-cell_vcode">

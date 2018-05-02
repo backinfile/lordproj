@@ -1,48 +1,86 @@
 <?php 
 require("run_sql.php");
 require("functions.php");
+date_default_timezone_set('Asia/Shanghai');
 if (get_post("request")) {
 	$ret = array("state"=>false,"error"=>null,"data"=>array());
 	$request = get_post("request");
-	if ($request == "insertuser") { 
+	if ($request == "insertuser") {
 		do {
 			$phone = get_post("phone");
-			if (!$phone || !check_phone($phone)) {
-				$ret['error'] = "手机号格式不正确";
+			$upper = get_post("upper");
+			$code = get_post("code");
+			if (!check_phone($phone)) {
+				$ret['error'] = "手机号格式错误";
 				break;
 			}
-			$upper = get_post("upper");
-			if ($upper) {
-				if (check_digit($upper)) {
-					$sql = "select phone from users where id='".$upper."';";
-					$upper = check_sql_exist($sql,'phone');
-					if (!$upper) {
-						$ret['error'] = "invite";
-						break;
-					}
-				} else if (check_phone($upper)) {
-					$sql = "select id from users where phone='".$upper."';";
-					if (!check_sql_exist($sql)) {
-						$ret['error'] = "invite";
+			if (!check_digit($code)) {
+				$ret['error'] = "邀请码格式错误";
+				break;
+			}
+			$res = run_sql("select id,code,code_time,signup from users where phone=$phone;");
+			if (!$res['state']) {
+				$ret['error'] = "服务器出错";
+				break;
+			}
+			if (empty($res['data'])) {
+				$ret['error'] = "尚未发送验证码";
+				break;
+			}
+			$id = $res['data'][0]['id'];
+			$signup = $res['data'][0]['signup'];
+			$code_time = strtotime($res['data'][0]['code_time']);
+			$t = strtotime("-2 minutes");
+			if ($code_time < $t) {
+				$ret['error'] = "验证码已失效";
+				break;
+			}
+			if ($code != $res['data'][0]['code']) {
+				$ret['error'] = "验证码错误";
+				break;
+			}
+			if ($signup == '1') {
+				$res = run_sql("update users set last_login_time=now() where id=$id;");
+				if (!$res['state']) {
+					$ret['error'] = "服务器错误";
+					break;
+				}
+				$ret['state'] = true;
+				$ret['data'] = "login";
+			} else {
+				// check upper first
+				if ($upper) {
+					if (check_digit($upper)) {
+						$res = run_sql("select phone from users where id=$upper;");
+						if (!$res['state'] || empty($res['data'])) {
+							$ret['error'] = "邀请人不存在";
+							break;
+						}
+						$upper = $res['data'][0]['phone'];
+					} else if (check_phone($upper)) {
+						$res = run_sql("select phone from users where phone=$upper;");
+						if (!$res['state'] || empty($res['data'])) {
+							$ret['error'] = "邀请人不存在";
+							break;
+						}
+					} else {
+						$ret['error'] = "邀请人格式不正确";
 						break;
 					}
 				} else {
-					$ret['error'] = "邀请人格式不正确";
+					$upper = "null";
+				}
+				$res = run_sql("update users set upper=$upper,signup=1,last_login_time=now(),time=now() where phone=$phone;");
+				$err = $res['error'];
+				if (!$res['state']) {
+					$ret['error'] = "服务器错误$err";
 					break;
 				}
+				$ret['state'] = true;
+				$ret['data'] = "signup";
 			}
-			$phone = "'".$phone."'";
-			if ($upper) {
-				$upper = "'".$upper."'";
-			} else $upper = "null";
-			
-			$sql = "insert into users (phone,upper,time) values ("
-				.$phone.",".$upper.",now());";
-			$result = run_sql($sql);
-			$ret['state'] = $result['state'];
-			$ret['error'] = $result['error'];
-			$ret['data'] = $result['data'];
 		} while(0);
+		
 	} else if ($request == "queryorder") {
 		$phone = get_post("phone");
 		if (!check_phone($phone)) {
@@ -50,7 +88,7 @@ if (get_post("request")) {
 			$ret['error'] = "phone error";
 		} else {
 			$sql = "select id,phone,service,state,is_rewarded,reward,time,last_time,note,value ".
-					"from orders where phone=".$phone.";";
+					"from orders where phone=$phone;";
 			$result = run_sql($sql);
 			$ret['state'] = $result['state'];
 			$ret['error'] = $result['error'];

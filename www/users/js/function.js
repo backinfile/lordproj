@@ -169,7 +169,7 @@ function html_reg() {
 			'	<a href="javascript:;" class="open-popup" data-target="#reg">'+
 			'	注册/登录</a></div>'+
 			'</div>'+
-			'</div>';
+			'</div><div class="weui-cells__tips">使用手机号登录可以查看您的订单状态</div> ';
 }
 
 function getPar(par){

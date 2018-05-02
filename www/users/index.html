@@ -27,16 +27,16 @@
 			  <label class="weui-label">手机号</label>
 			</div>
 			<div class="weui-cell_bd">
-			  <input class="weui-input" type="number" id="tel" placeholder="手机号(必填)" >
+			  <input class="weui-input" type="number" id="tel" placeholder="(必填)" value="15209230125">
 			</div>
 		  </div>
 		  <div class="weui-cell weui-cell_vcode">
 			<div class="weui-cell__hd"><label class="weui-label">验证码</label></div>
 			<div class="weui-cell__bd">
-			  <input class="weui-input" type="number" placeholder="验证码">
+			  <input class="weui-input" type="number" placeholder="(必填)" id="codev">
 			</div>
 			<div class="weui-cell__ft">
-			  <button class="weui-vcode-btn">获取验证码</button>
+			  <button class="weui-vcode-btn" id="code">获取验证码</button>
 			</div>
 		  </div>
 		  <div class="weui-cell">
@@ -44,11 +44,11 @@
 			  <label class="weui-label">邀请人</label>
 			</div>
 			<div class="weui-cell__bd">
-			  <input class="weui-input" type="number" id="upper" placeholder="手机号或邀请码(选填)">
+			  <input class="weui-input" type="number" id="upper" placeholder="(选填)">
 			</div>
 		  </div>
 		  </div>
-		  <div class="weui-cells__tips">填写邀请人的手机号或邀请码</div> 
+		  <div class="weui-cells__tips">填写邀请人的手机号或邀请码,登录时无视此项</div> 
 		<div class="weui-btn-area">
 		  <a class="weui-btn weui-btn_primary" href="javascript:" id="showTooltips">注册/登录</a>
 		  <a href="javascript:;" class="weui-btn weui-btn_primary close-popup">取消</a>
@@ -58,17 +58,94 @@
 	  </div>
 	</div>
 	<br/>
-	<article class="weui-article">
-	  <section>
-			<a href="http://t.cn/RmC6uhi"><img src="1.jpg" alt=""></a>
-	  </section>
-	</article>
+	
+	<div class="timg"><img src="2.jpg" alt=""><img src="1.jpg" alt=""></div>
+	<div class="timg"><img src="2.jpg" alt=""><img src="1.jpg" alt=""></div>
+	<div class="weui-panel weui-panel_access">
+	  <div class="weui-panel__bd">
+		<a href="javascript:void(0);" class="weui-media-box weui-media-box_appmsg">
+		  <div class="weui-media-box__hd">
+			<img class="weui-media-box__thumb" src="2.jpg">
+		  </div>
+		  <div class="weui-media-box__bd">
+			<img class="weui-media-box__thumb" src="1.jpg">
+		  </div>
+		</a>
+	  </div>
+	  <div class="weui-panel__bd">
+		<a href="javascript:void(0);" class="weui-media-box weui-media-box_appmsg">
+		  <div class="weui-media-box__hd">
+			<img class="weui-media-box__thumb" src="2.jpg">
+		  </div>
+		  <div class="weui-media-box__bd">
+			<img class="weui-media-box__thumb" src="1.jpg">
+		  </div>
+		</a>
+	  </div>
+	</div>
+	<!-- <article class="weui-article">
+        <section>
+          <p>
+            <img src="1.jpg" alt="">
+            <img src="2.jpg" alt="">
+          </p>
+       
+      </section>
+    </article> -->
+	
+	
+	
+	<br/><br/><br/><br/>
 	<div class="weui-footer weui-footer_fixed-bottom" style="background-color:white">
 	  <p class="weui-footer__links">
 		<a href="javascript:quit()" class="weui-footer__link">退出登录</a>
 	  </p>
 	  <p class="weui-footer__text">Copyright © 2008-2016 weui.io</p>
 	</div>
+	
+	<script>
+	$('#code').click(function() {
+		var tel = $('#tel').val().trim();
+		if (!check_phone(tel)) {$.toptip('手机号的格式不正确');return;}
+		$('#code').html("<i class='weui-loading'></i>正在发送");
+		$('#code').attr('disabled',true);
+		$.ajax({
+			type: 'POST',
+			url: '../interface/send.php',
+			data: {'request':'send','phone':tel},
+			dataType: 'json'
+		}).success(function(data){
+			console.log(data);
+			if (data['state']) {
+				$.toptip("已将验证码发送到手机","success");
+				$('#code').attr('disabled',true);
+				$('#code').html("剩余60秒");
+				var cnt = 59;
+				var inter = setInterval( function () {
+					if (cnt == 0) {
+						clearInterval(inter);
+						$('#code').attr('disabled',false);
+						$('#code').html("获取验证码");
+						return;
+					}
+					$('#code').html("剩余"+cnt+"秒");
+					cnt--;
+				}, 1000);
+			} else {
+				$.toptip(data['error']);
+				$('#code').html("获取验证码");
+				$('#code').attr('disabled',false);
+			}
+		}).error(function(e){
+			console.log(e);
+			$.toptip('发送失败');
+			$('#code').html("获取验证码");
+			$('#code').attr('disabled',false);
+		});
+		
+		
+	});
+	</script>
 	<script>
 	function quit() {
 		if (getCookie('phone')) {
@@ -79,45 +156,45 @@
 			$.toptip("尚未登录");
 		}
 	}
-	var invite = getPar('invite');
-	if (invite) setCookie('invite',invite,1);
-	$(function() {
-		var invite = getCookie('invite');
-		if (invite) $('#upper').val(invite);
-	});
-	var phone = getCookie('phone');
-	if (phone) {
-		$.ajax({
-			type: 'POST',
-			url: '../interface/request.php',
-			data: {'request':'querylaststate','phone':phone},
-			dataType: 'json'
-		}).success(function(data){
-			if (data['state']) {
-				if (data['data'].length) {
-					var state = get_order_state(data['data'][0]['state']);
-					$('#user').html(html_user(phone,state));
-				} else {
-					state = "尚无订单";
-					$('#user').html(html_user(phone,state));
-				}
-			} else {
-				$.toptip("请重新登录");
-				delCookie('phone');
-				setTimeout(function(){location.reload();}, 1000);
-			}
-		});
-	} else {
-		$('#user').html(html_reg());
-	}
 	</script>
 	<script>
 	  $(function() {
 		FastClick.attach(document.body);
-		//$("#upper").val(getPar('invite'));
 		setTimeout(function() { window.scrollTo(0, 1); }, 0);
-	  });
-	  $("#showTooltips").click(function() {
+		
+		var invite = getPar('invite');
+		if (invite) setCookie('invite',invite,1);
+		$(function() {
+			var invite = getCookie('invite');
+			if (invite) $('#upper').val(invite);
+		});
+		var phone = getCookie('phone');
+		if (phone) {
+			$.ajax({
+				type: 'POST',
+				url: '../interface/request.php',
+				data: {'request':'querylaststate','phone':phone},
+				dataType: 'json'
+			}).success(function(data){
+				if (data['state']) {
+					if (data['data'].length) {
+						var state = get_order_state(data['data'][0]['state']);
+						$('#user').html(html_user(phone,state));
+					} else {
+						state = "尚无订单";
+						$('#user').html(html_user(phone,state));
+					}
+				} else {
+					$.toptip("请重新登录");
+					delCookie('phone');
+					setTimeout(function(){location.reload();}, 1000);
+				}
+			});
+		} else {
+			$('#user').html(html_reg());
+		}
+		$("#showTooltips").click(function() {
+			var code = $('#codev').val();
 			var tel = $('#tel').val().trim();
 			var upper = $('#upper').val().trim();
 			if (!check_phone(tel)) {$.toptip('手机号的格式不正确');return;}
@@ -130,23 +207,16 @@
 			$.ajax({
 				type: 'POST',
 				url: '../interface/request.php',
-				data: {request:'insertuser',phone:tel,upper:upper},
+				data: {request:'insertuser',phone:tel,upper:upper,'code':code},
 				dataType: 'json'
 			}).success(function(data){
 				if (data['state']) {
 					setCookie('phone', tel);
-					$.toptip('注册成功', 'success');
+					if (data['data'] == 'signup') $.toptip('注册成功', 'success');
+					else $.toptip('登陆成功', 'success');
 					setTimeout(function(){location.reload();}, 1000);
 				} else {
-					if (/^Duplicate/.test(data['error'])) {
-						$.toptip('登录成功', 'success');
-						setCookie('phone', tel);
-						setTimeout(function(){location.reload();}, 1000);
-					} else if(/^invite/.test(data['error'])) {
-						$.toptip('邀请人不存在');
-					} else {
-						$.toptip('提交失败');
-					}
+					$.toptip(data['error']);
 				}
 				console.log(data);
 				$.hideLoading();
@@ -155,7 +225,23 @@
 				$.toptip('提交失败');
 				$.hideLoading();
 			});
+	    });
 	  });
+	  
+	</script>
+	<script>
+	$(function() {
+		var imgs = $('.timg').children();
+		var width = $(document.body).width()-30;
+		var rate = imgs[1].width/imgs[1].height;
+		var x = width/(rate+1);
+		$('.timg').children().css('width', function(index) {
+			return index%2?(width-x):x;
+		}).css('height', x).css('marginLeft', function(index){
+			return 10;
+			return index%2?0:10;
+		}).css('marginTop','10px');
+	});
 	</script>
 	</body>
 </html>

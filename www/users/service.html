@@ -1,0 +1,102 @@
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<link rel="stylesheet" href="../lib/weui/lib/weui.min.css">
+		<link rel="stylesheet" href="../lib/weui/css/jquery-weui.css">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"> 
+		<script src="../lib/weui/lib/jquery.js"></script>
+		<script src="../lib/weui/lib/fastclick.js"></script>
+		<script src="../lib/weui/js/jquery-weui.js"></script>
+		<title>产品列表</title>
+	</head>
+	<body ontouchstart>
+	
+	
+	<div class="weui-cells">
+		<a class="weui-cell weui-cell_access" href="javascript:void(0)">
+			<div class="weui-cell__bd">
+				<p>添加产品</p>
+			</div>
+			<div class="weui-cell__ft""></div>
+		</a>
+	</div>
+	
+	<div class="weui-cells">
+		<div class="weui-cell" href="javascript:;">
+			<div class="weui-cell__bd">
+			<p>产品名称</p>
+			</div>
+			<div class="weui-cell__ft"  style="color:black">宜人网</div>
+		</div>
+		
+		<div class="weui-cell">
+		<div class="weui-cell__bd">
+		  <div class="weui-uploader">
+			<div class="weui-uploader__hd">
+			  <p class="weui-uploader__title">产品图片</p>
+			  <div class="weui-uploader__info">1/2</div>
+			</div>
+			<div class="weui-uploader__bd">
+			  <ul class="weui-uploader__files" id="uploaderFiles">
+				<li class="weui-uploader__file" style="background-image:url(1.jpg)"></li>
+			  </ul>
+			  <div class="weui-uploader__input-box">
+				<input id="uploaderInput" class="weui-uploader__input" type="file" accept="image/*">
+			  </div>
+			</div>
+		  </div>
+		</div>
+		</div>
+		<div class="weui-cell" href="javascript:;">
+			<div class="weui-cell__bd">
+			<p>产品链接</p>
+			</div>
+			<div class="weui-cell__ft"  style="color:black">http://t.cn/RmC6uhi</div>
+		</div>
+		<a class="weui-cell weui-cell_access" href="javascript:void(0)">
+			<div class="weui-cell__bd">
+				<p style="color:red">删除此产品</p>
+			</div>
+			<div class="weui-cell__ft" style="color:red"></div>
+		</a>
+	</div>
+	
+	<script>
+	$(function () {
+		FastClick.attach(document.body);
+		
+		var services = [{
+			'id':0,
+			'name':'宜人网',
+			'url':'http://t.cn/RmC6uhi',
+			'pic1': '../img/2.jpg',
+			'pic2': null
+		}];
+		
+		$('#uploaderInput').change(function() {
+			var fileObj = $('#uploaderInput').get(0).files[0];
+			if (!fileObj) return;
+			$('#uploaderInput').val('');
+			var formFile = new FormData();
+			formFile.append("action", "UploadVMKImagePath");  
+			formFile.append("file", fileObj);
+			$.ajax({
+				type: 'POST',
+				url: '../interface/upload.php',
+				data: formFile,
+				dataType: 'json',
+				cache: false,
+				processData: false,
+				contentType: false
+			}).success(function(data){
+				console.log(data);
+				services[0]['pic2'] = data['data']['url'];
+				
+			}).error(function(e){
+				console.error(e);
+			});
+		});
+	});
+	</script>
+  </body>
+</html>
